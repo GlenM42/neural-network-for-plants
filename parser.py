@@ -5,6 +5,7 @@ import json
 file_path = "user_data_cleaned.csv"
 df = pd.read_csv(file_path, dtype=str, low_memory=False)
 
+
 # Initial look
 # print(df.head())
 # print(df.describe())
@@ -82,7 +83,7 @@ subject_data_frequency = new_df['subject_data'].value_counts()
 #
 #     # Print username and filename
 #     if row['user_name'] in active_users:
-#         print(f"User: {row['user_name']}, Filename: {filename}")
+#         print(f"User: {row['user_name']}, Filename: {filename}, Answer: {row['answer']}")
 
 # ================================
 # ANSWERS
@@ -90,5 +91,37 @@ subject_data_frequency = new_df['subject_data'].value_counts()
 
 x = new_df['answer']
 answer_frequency = x.value_counts()
-print(answer_frequency)
+# print("\n=====================", answer_frequency)
 
+unique_answers = df['answer'].unique()
+for answer in unique_answers:
+    print(answer)
+
+bad_answers = ['Desktop},{"task"', 'Phone},{"task"', 'null}]', 'Not sure }]', 'Not Sure}]', 'Not sure}]', 'No sure }]',
+               'Unsure}]']
+
+# Create an empty list to store the data
+data_list = []
+
+for index, row in new_df.iterrows():
+    # Load the JSON string
+    data = json.loads(row['subject_data'])
+
+    # Extract the value of the 'Filename' key
+    filename = None
+    for key, value in data.items():
+        if isinstance(value, dict) and 'Filename' in value:
+            filename = value['Filename']
+            break
+
+    # Print username and filename
+    if (row['user_name'] in active_users) and (row['answer'] not in bad_answers):
+        data_list.append({'Filename': filename, 'Answer': row['answer']})
+        # print(f"Filename: {filename}, Answer: {row['answer']}")
+        # print(f"User: {row['user_name']}, Filename: {filename}, Answer: {row['answer']}")
+
+# Create a DataFrame from the list
+result_df = pd.DataFrame(data_list)
+
+# Save the DataFrame to a CSV file or another format
+result_df.to_csv('output_data.csv', index=False)
