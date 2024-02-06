@@ -21,3 +21,19 @@ grouped_answers = df.groupby('Filename')['Answer'].apply(list).reset_index()
 result_df = pd.merge(filename_df, grouped_answers, on='Filename', how='left')
 
 print(result_df)
+
+# THE NEXT STEPS:
+# 1. get rid of 'Copy of' in the names
+# 2. somehow chose the best answer
+
+
+# Remove "Copy of" from the filenames
+result_df['Filename'] = result_df['Filename'].str.replace('^Copy of ', '', regex=True)
+
+# Group answers by filename into a list again
+grouped_answers = result_df.groupby('Filename')['Answer'].sum().reset_index()
+
+# Resetting index to avoid multi-index
+grouped_answers = grouped_answers.reset_index(drop=True)
+
+print(grouped_answers)
