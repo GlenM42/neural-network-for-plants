@@ -35,7 +35,7 @@ plt.xlabel('User Name')
 plt.ylabel('Count')
 plt.title('User Activity')
 # Display the chart
-plt.show()
+# plt.show()
 
 # Obviously, we need not care about those dudes who made ultra low contributions
 # Therefore, I will do a test to find out 80% of the distribution
