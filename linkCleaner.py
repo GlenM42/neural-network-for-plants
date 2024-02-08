@@ -1,7 +1,8 @@
+#Phillip Waul
+#2/7/2024
 import pandas as pd
-import matplotlib.pyplot as plt
-import json
 
+#Open our csv and use it as a data frame in pandas
 file_path = "plant_images.csv"
 df = pd.read_csv(file_path, dtype=str, low_memory=False)
 

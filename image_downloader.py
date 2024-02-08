@@ -1,4 +1,5 @@
-
+#Phillip Waul
+#2/7/2024
 import pandas as pd
 import requests 
 from PIL import Image 
@@ -15,7 +16,7 @@ for index, row in df.iterrows():
     #create new file with the name of the image in the working row
     image_path = "./images/" + row["image_name"]
     f = open(image_path,'wb') 
-    #write data to file and finish.
+    #write data to file and finish before looping to next row.
     f.write(data)
     f.close()
 
