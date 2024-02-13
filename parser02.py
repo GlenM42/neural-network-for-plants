@@ -29,7 +29,7 @@ grouped_answers = result_df.groupby('Filename')['Answer'].sum().reset_index()
 # Resetting index to avoid multi-index
 grouped_answers = grouped_answers.reset_index(drop=True)
 
-# print(grouped_answers)
+print(grouped_answers)
 
 # An attempt at getting rid of the 100 copies in the grouped_answer
 
@@ -39,4 +39,4 @@ new_df = plant_images_df[column_names]
 # print(new_df)
 
 grouped_image_names = new_df.groupby('metadata')['image_id'].apply(list).reset_index()
-print(grouped_image_names)
+# print(grouped_image_names)
