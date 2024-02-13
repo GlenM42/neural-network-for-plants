@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5f812268-46c9-4aa3-a2c8-5b8e1a25c137" name="Changes" comment="merged the copies of filenames&#10;&#10;still have ~100 copies that we should find">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/neural-network-for-plants.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/neural-network-for-plants.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/parser02.py" beforeDir="false" afterPath="$PROJECT_DIR$/parser02.py" afterDir="false" />
-    </list>
+    <list default="true" id="5f812268-46c9-4aa3-a2c8-5b8e1a25c137" name="Changes" comment="merged the copies of filenames&#10;&#10;still have ~100 copies that we should find" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -130,7 +125,7 @@
       <option name="presentableId" value="Default" />
       <updated>1706819390069</updated>
       <workItem from="1706819391295" duration="8853000" />
-      <workItem from="1707853902287" duration="885000" />
+      <workItem from="1707853902287" duration="1209000" />
     </task>
     <task id="LOCAL-00001" summary="added the user data set &amp; the image dataset">
       <option name="closed" value="true" />
