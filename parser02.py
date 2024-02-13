@@ -38,5 +38,3 @@ column_names = ['image_id', 'metadata']
 new_df = plant_images_df[column_names]
 # print(new_df)
 
-grouped_image_names = new_df.groupby('metadata')['image_id'].apply(list).reset_index()
-# print(grouped_image_names)

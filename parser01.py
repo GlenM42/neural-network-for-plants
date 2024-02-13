@@ -55,39 +55,12 @@ plt.legend()
 # plt.show()
 
 # ================================
-# WORKFLOW
-# ================================
-
-# print(new_df['workflow_name'])
-workflow_name_frequency = new_df['workflow_name'].value_counts()
-# print(workflow_name_frequency)
-
-# ================================
 # SUBJECT DATA
 # ================================
 
 print(new_df['subject_data'][0])
 subject_data_frequency = new_df['subject_data'].value_counts()
 # print(subject_data_frequency)
-
-# for index, row in new_df.iterrows():
-#     # Load the JSON string
-#     data = json.loads(row['subject_data'])
-#
-#     # Extract the value of the 'Filename' key
-#     filename = None
-#     for key, value in data.items():
-#         if isinstance(value, dict) and 'Filename' in value:
-#             filename = value['Filename']
-#             break
-#
-#     # Print username and filename
-#     if row['user_name'] in active_users:
-#         print(f"User: {row['user_name']}, Filename: {filename}, Answer: {row['answer']}")
-
-# ================================
-# ANSWERS
-# ================================
 
 x = new_df['answer']
 answer_frequency = x.value_counts()
