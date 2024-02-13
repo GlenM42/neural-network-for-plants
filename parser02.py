@@ -20,13 +20,6 @@ grouped_answers = df.groupby('Filename')['Answer'].apply(list).reset_index()
 # Step 3.3: Merge filename_df with grouped_answers
 result_df = pd.merge(filename_df, grouped_answers, on='Filename', how='left')
 
-print(result_df)
-
-# THE NEXT STEPS:
-# 1. get rid of 'Copy of' in the names
-# 2. somehow chose the best answer
-
-
 # Remove "Copy of" from the filenames
 result_df['Filename'] = result_df['Filename'].str.replace('^Copy of ', '', regex=True)
 
@@ -37,3 +30,13 @@ grouped_answers = result_df.groupby('Filename')['Answer'].sum().reset_index()
 grouped_answers = grouped_answers.reset_index(drop=True)
 
 print(grouped_answers)
+
+# An attempt at getting rid of the 100 copies in the grouped_answer
+
+plant_images_df = pd.read_csv("plant_images.csv")
+column_names = ['image_id', 'metadata']
+new_df = plant_images_df[column_names]
+# print(new_df)
+
+grouped_image_names = new_df.groupby('metadata')['image_id'].apply(list).reset_index()
+# print(grouped_image_names)
