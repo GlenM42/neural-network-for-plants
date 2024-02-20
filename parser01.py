@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import json
 
-file_path = "user_data_cleaned.csv"
+file_path = "pieces_of_datasets/user_data_cleaned.csv"
 df = pd.read_csv(file_path, dtype=str, low_memory=False)
 
 

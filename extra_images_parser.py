@@ -6,11 +6,11 @@
 # 2/13/24
 import pandas as pd
 
-file_path = "plant_images_cleaned.csv"
+file_path = "pieces_of_datasets/plant_images_cleaned.csv"
 links_frame = pd.read_csv(file_path, dtype=str, low_memory=False)
 
-f = open("extra_images.txt", "r")
-f_clean = open("extra_images_cleaned.txt", "a")
+f = open("pieces_of_datasets/extra_images.txt", "r")
+f_clean = open("pieces_of_datasets/extra_images_cleaned.txt", "a")
 
 iList = []
 count = 0

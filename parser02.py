@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Load the dataset
-df = pd.read_csv("output_data.csv")
+df = pd.read_csv("pieces_of_datasets/output_data.csv")
 
 # Step 1: Clean the Answer column
 df['Answer'] = df['Answer'].str.replace('[\[\}\]]', '', regex=True)
@@ -33,7 +33,7 @@ print(grouped_answers)
 
 # An attempt at getting rid of the 100 copies in the grouped_answer
 
-plant_images_df = pd.read_csv("plant_images.csv")
+plant_images_df = pd.read_csv("pieces_of_datasets/plant_images.csv")
 column_names = ['image_id', 'metadata']
 new_df = plant_images_df[column_names]
 # print(new_df)

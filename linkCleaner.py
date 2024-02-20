@@ -3,7 +3,7 @@
 import pandas as pd
 
 #Open our csv and use it as a data frame in pandas
-file_path = "plant_images.csv"
+file_path = "pieces_of_datasets/plant_images.csv"
 df = pd.read_csv(file_path, dtype=str, low_memory=False)
 
 #I think the name "image_name" makes a lot more sense than "metadata" at this point so I'm changing that in particular.

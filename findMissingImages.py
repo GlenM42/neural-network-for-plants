@@ -17,13 +17,13 @@ def Clean_filename(filename):
 
 
 #Open our csv and use it as a data frame in pandas
-file_path = "output_data.csv"
+file_path = "pieces_of_datasets/output_data.csv"
 name_frame = pd.read_csv(file_path, dtype=str, low_memory=False)
-file_path = "plant_images_cleaned.csv"
+file_path = "pieces_of_datasets/plant_images_cleaned.csv"
 links_frame = pd.read_csv(file_path, dtype=str, low_memory=False)
 
 count = 0
-f = open("extra_images.txt", "a")
+f = open("pieces_of_datasets/extra_images.txt", "a")
 
 #Not the most efficient way to do this, but I just wanted to make sure it would work
 #Loops through every image in one csv, then loops through the entire second csv and makes sure the image is in both.
