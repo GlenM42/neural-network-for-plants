@@ -5,6 +5,20 @@
 
 import tensorflow as tf
 from tensorflow.keras.utils import image_dataset_from_directory
+from PIL import Image
+import os
+
+image_dir = 'images'  # Path to your images directory
+for subdir, dirs, files in os.walk(image_dir):
+    for file in files:
+        if file.lower().endswith('.jpg') or file.lower().endswith('.jpeg'):
+            file_path = os.path.join(subdir, file)
+            try:
+                with Image.open(file_path) as img:
+                    img.save(f"{file_path}.tmp")  # Attempt to re-save the image
+                    os.replace(f"{file_path}.tmp", file_path)  # Replace original with re-saved image
+            except Exception as e:
+                print(f"Error processing file {file_path}: {e}")
 
 # Load the dataset from the directory
 train_dataset = image_dataset_from_directory(
