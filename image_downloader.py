@@ -5,7 +5,7 @@ import requests
 from PIL import Image 
 
 #Open our csv and use it as a data frame in pandas
-file_path = "plant_images_cleaned.csv"
+file_path = "pieces_of_datasets/plant_images_cleaned.csv"
 df = pd.read_csv(file_path, dtype=str, low_memory=False)
 
 for index, row in df.iterrows():

@@ -47,7 +47,7 @@ def extract_filename(json_str):
 
 # Read the CSV file and parse each line
 parsed_data = []
-with open('Reproductive.csv', newline='') as csvfile:
+with open('pieces_of_datasets/Reproductive.csv', newline='') as csvfile:
     reader = csv.reader(csvfile, delimiter='\n')
     for row in reader:
         line = row[0]
@@ -76,7 +76,7 @@ clean_df['Answer'] = df[3]
 
 print("\n==============\n")
 
-df = pd.read_csv("output_data.csv", dtype=str, low_memory=False)
+df = pd.read_csv("pieces_of_datasets/output_data.csv", dtype=str, low_memory=False)
 
 unique_answers = df['Answer'].unique()
 
@@ -145,7 +145,7 @@ print(grouped_df)
 
 print("\n====ADD=LINKS=AND=IMAGE=ID==========\n")
 
-data_images_df = pd.read_csv('plant_images_cleaned.csv')
+data_images_df = pd.read_csv('pieces_of_datasets/plant_images_cleaned.csv')
 print(data_images_df)
 
 # Merge the datasets on the 'Filename' and 'image_name' columns
