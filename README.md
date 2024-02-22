@@ -8,11 +8,7 @@
    - the first one, 'user_name' was analyzed
 
 ### Activity Log
-Glen: I think we should analyze each of those columns one by one. In the process of doing so, we will
-simplify and shring dataset to a substantial degree. I was able to do it for 'user_name' column. 
-For example, from the start we got 1767 distinct users. After we delete 'not-logged-in', we are left
-with 1009. The graph of the distribution shows that SO MANY of them are dudes who made 1 guess. 
-After considering only 80% of the distribution, we are left with 199 users. 
+Working on the Reproductive dataset 
 
 ### Some usefull links for future
 
