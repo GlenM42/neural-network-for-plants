@@ -5,15 +5,13 @@
 
 import tensorflow as tf
 import keras
-from tensorflow.keras.utils import image_dataset_from_directory
-from PIL import Image
 import matplotlib.pyplot as plt
-import os
 from keras import models
 from keras import layers
-from keras.datasets import mnist
 
 img_w, img_h = 256, 256
+# import os
+# from PIL import Image
 # image_dir = 'images'  # Path to your images directory
 # for subdir, dirs, files in os.walk(image_dir):
 #    for file in files:
@@ -43,7 +41,7 @@ img_w, img_h = 256, 256
 )
 
 
-# this function helps seperate out the list of images and list of labels in each set of data.
+# this function helps separate out the list of images and list of labels in each set of data.
 def extract_images_labels(image, label):
     return image, label
 
