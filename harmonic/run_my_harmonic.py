@@ -11,8 +11,9 @@ sys.path.append('../')
 
 import numpy as np
 import tensorflow as tf
+import keras
 
-from my_harmonic_model import deep_mnist
+from my_harmonic_model import my_harmonic
 
 # This is unnecessary for our project, but it was in the original so I will leave it here for now.
 # def download2FileAndExtract(url, folder, fileName):
@@ -68,6 +69,10 @@ def getData(args):
       data['train_x'] = train_images_set
       data['train_y'] = train_labels_set
    else:
+      train_images_array = tf.concat(list(train_images_set.as_numpy_iterator()), axis=0)
+      train_labels_array = tf.concat(list(train_labels_set.as_numpy_iterator()), axis=0)
+      test_images_array = tf.concat(list(train_images_set.as_numpy_iterator()), axis=0)
+      test_labels_array = tf.concat(list(train_labels_set.as_numpy_iterator()), axis=0)
       #This splits our training data sets into training and validation.
       partial_train_images = train_images_array[84:]
       train_images_val = train_images_array[:84]
@@ -106,7 +111,7 @@ def settings(args):
    #    data['valid_y'] = valid['y']
    # data['test_x'] = test['x']
    # data['test_y'] = test['y']
-   data = getData()
+   data = getData(args)
    
    # Other options
    if args.default_settings:
