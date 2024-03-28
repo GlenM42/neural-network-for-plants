@@ -11,7 +11,7 @@ import tensorflow as tf
 import harmonic_network_lite as hn_lite
 #from harmonic_network_helpers import *
 
-def deep_mnist(args, x, train_phase):
+def my_harmonic(args, x, train_phase):
    """The MNIST-rot model similar to the one in Cohen & Welling, 2016"""
    # Sure layers weight & bias
    order = 1

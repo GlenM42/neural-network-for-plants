@@ -5,14 +5,14 @@ import os
 import random
 import sys
 import time
-import urllib2
-import zipfile
+#import urllib2
+#import zipfile
 sys.path.append('../')
 
 import numpy as np
 import tensorflow as tf
 
-from mnist_model import deep_mnist
+from my_harmonic_model import deep_mnist
 
 # This is unnecessary for our project, but it was in the original so I will leave it here for now.
 # def download2FileAndExtract(url, folder, fileName):
@@ -35,9 +35,53 @@ from mnist_model import deep_mnist
 #    os.chdir(wd)
 #    print('Successfully retrieved rotated rotated MNIST dataset.')
 
+def extract_images_labels(image, label):
+    return image, label
+
 def getData(args):
+   img_w, img_h = 256, 256
    #TODO make this function prep our dataset in a way that works with the below settings function
-   print('bruh')
+   (train_set, test_set) = keras.utils.image_dataset_from_directory(
+    directory="images",
+    labels="inferred",
+    label_mode="categorical",
+    color_mode="rgb",
+    batch_size=None,
+    image_size=(img_w, img_h),
+    shuffle=True,
+    seed=123,  # Seed for shuffling and transformations
+    validation_split=0.2,  # Adjust the split ratio as needed
+    subset="both",
+    interpolation="bilinear",
+   )
+   #TODO learnable resizing
+   train_set = train_set.map(extract_images_labels)
+   test_set = train_set.map(extract_images_labels)
+   # Now, you can use the `unbatch` method to separate images and labels
+   train_images_set = train_set.map(lambda image, label: image)
+   train_labels_set = train_set.map(lambda image, label: label)
+   test_images_set = train_set.map(lambda image, label: image)
+   test_labels_set = train_set.map(lambda image, label: label)
+   
+   data = {}
+   if args.combine_train_val:
+      data['train_x'] = train_images_set
+      data['train_y'] = train_labels_set
+   else:
+      #This splits our training data sets into training and validation.
+      partial_train_images = train_images_array[84:]
+      train_images_val = train_images_array[:84]
+      train_labels_val = train_labels_array[:84]
+      partial_train_labels = train_labels_array[84:]
+
+
+      data['train_x'] = partial_train_images
+      data['train_y'] = partial_train_labels
+      data['valid_x'] = train_images_val
+      data['valid_y'] = train_labels_val
+   data['test_x'] = test_images_set
+   data['test_y'] = test_labels_set
+   return data
 
 
 def settings(args):
@@ -62,7 +106,7 @@ def settings(args):
    #    data['valid_y'] = valid['y']
    # data['test_x'] = test['x']
    # data['test_y'] = test['y']
-   getData()
+   data = getData()
    
    # Other options
    if args.default_settings:
@@ -137,7 +181,7 @@ def main(args):
    train_phase = tf.placeholder(tf.bool, name='train_phase')
 
    # Construct model and optimizer
-   pred = deep_mnist(args, x, train_phase)
+   pred = my_harmonic(args, x, train_phase)
    loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred, labels=y))
 
    # Evaluation criteria
