@@ -1,18 +1,18 @@
 """Run MNIST-rot"""
 
 import argparse
+import math
+import os
 import os
 import random
 import sys
+sys.path.append("../")
 import time
-#import urllib2
-#import zipfile
-sys.path.append('../')
-
+from PIL import Image
 import numpy as np
 import tensorflow as tf
-import keras
-
+tf.compat.v1.disable_eager_execution()
+from tensorflow import keras
 from my_harmonic_model import my_harmonic
 
 # This is unnecessary for our project, but it was in the original so I will leave it here for now.
@@ -36,58 +36,57 @@ from my_harmonic_model import my_harmonic
 #    os.chdir(wd)
 #    print('Successfully retrieved rotated rotated MNIST dataset.')
 
-def extract_images_labels(image, label):
-    return image, label
+def load_images_from_directory(directory, image_size):
+   images = []
+   labels = []
+   for label_dir in os.listdir(directory):
+      if label_dir == ".DS_Store":
+         continue
+      i = 0
+      label = i #int(label_dir)
+      label_path = os.path.join(directory, label_dir)
+      for image_file in os.listdir(label_path):
+         image_path = os.path.join(label_path, image_file)
+         # Even learnable resizing requires an initial resizing.
+         image = Image.open(image_path).resize(image_size, Image.BILINEAR )
+         image = image.convert('RGB')
+         image = np.array(image, dtype="float32")  # Normalize the image
+         images.append(image)
+         labels.append(label)
+      i += 1
+   return np.array(images, dtype="float32"), np.array(labels)
+
 
 def getData(args):
    img_w, img_h = 256, 256
-   #TODO make this function prep our dataset in a way that works with the below settings function
-   (train_set, test_set) = keras.utils.image_dataset_from_directory(
-    directory="images",
-    labels="inferred",
-    label_mode="categorical",
-    color_mode="rgb",
-    batch_size=None,
-    image_size=(img_w, img_h),
-    shuffle=True,
-    seed=123,  # Seed for shuffling and transformations
-    validation_split=0.2,  # Adjust the split ratio as needed
-    subset="both",
-    interpolation="bilinear",
-   )
-   #TODO learnable resizing
-   train_set = train_set.map(extract_images_labels)
-   test_set = train_set.map(extract_images_labels)
-   # Now, you can use the `unbatch` method to separate images and labels
-   train_images_set = train_set.map(lambda image, label: image)
-   train_labels_set = train_set.map(lambda image, label: label)
-   test_images_set = train_set.map(lambda image, label: image)
-   test_labels_set = train_set.map(lambda image, label: label)
+   print(os.getcwd())
+   images, labels = load_images_from_directory("./images", (img_w, img_h))
+   
+   #dividing images into a testing set and a trainging set
+   testing_ratio = .3
+   floor = math.floor(len(images)*testing_ratio)
+   divider = math.floor(len(images)*testing_ratio)
+   train_images = images[:-divider]
+   test_images = images[-divider-1:]
+   divider = math.floor(len(labels)*testing_ratio)
+   train_labels = labels[:-divider]
+   test_labels = labels[-divider-1:]
+
    
    data = {}
    if args.combine_train_val:
-      data['train_x'] = train_images_set
-      data['train_y'] = train_labels_set
+      data['train_x'] = train_images
+      data['train_y'] = train_labels
    else:
-      train_images_array = tf.concat(list(train_images_set.as_numpy_iterator()), axis=0)
-      train_labels_array = tf.concat(list(train_labels_set.as_numpy_iterator()), axis=0)
-      test_images_array = tf.concat(list(train_images_set.as_numpy_iterator()), axis=0)
-      test_labels_array = tf.concat(list(train_labels_set.as_numpy_iterator()), axis=0)
-      #This splits our training data sets into training and validation.
-      partial_train_images = train_images_array[84:]
-      train_images_val = train_images_array[:84]
-      train_labels_val = train_labels_array[:84]
-      partial_train_labels = train_labels_array[84:]
-
-
-      data['train_x'] = partial_train_images
-      data['train_y'] = partial_train_labels
-      data['valid_x'] = train_images_val
-      data['valid_y'] = train_labels_val
-   data['test_x'] = test_images_set
-   data['test_y'] = test_labels_set
+      val_ratio = .2
+      divider = math.floor(len(train_images)*val_ratio)
+      data['train_x'] = train_images[:-divider]
+      data['train_y'] = train_labels[:-divider]
+      data['valid_x'] = train_images[-divider-1:]
+      data['valid_y'] = train_labels[-divider-1:]
+   data['test_x'] = test_images
+   data['test_y'] = test_labels
    return data
-
 
 def settings(args):
    # Download MNIST if it doesn't exist
@@ -111,7 +110,7 @@ def settings(args):
    #    data['valid_y'] = valid['y']
    # data['test_x'] = test['x']
    # data['test_y'] = test['y']
-   data = getData(args)
+   data = getData(args) 
    
    # Other options
    if args.default_settings:
@@ -137,13 +136,11 @@ def settings(args):
    args.checkpoint_path = add_folder('./checkpoints') + '/model.ckpt'
    return args, data
 
-
 def add_folder(folder_name):
    if not os.path.exists(folder_name):
       os.mkdir(folder_name)
       print('Created {:s}'.format(folder_name))
    return folder_name
-
 
 def minibatcher(inputs, targets, batchsize, shuffle=False):
    assert len(inputs) == len(targets)
@@ -171,19 +168,18 @@ def get_learning_rate(args, current, best, counter, learning_rate):
       counter += 1
    return (best, counter, learning_rate)
 
-
 def main(args):
    """The magic happens here"""
-   tf.reset_default_graph()
+   tf.compat.v1.reset_default_graph()
    ##### SETUP AND LOAD DATA #####
    args, data = settings(args)
-   
    ##### BUILD MODEL #####
    ## Placeholders
-   x = tf.placeholder(tf.float32, [args.batch_size,784], name='x')
-   y = tf.placeholder(tf.int64, [args.batch_size], name='y')
-   learning_rate = tf.placeholder(tf.float32, name='learning_rate')
-   train_phase = tf.placeholder(tf.bool, name='train_phase')
+   # [args.batch_size, 784]
+   x = tf.compat.v1.placeholder(tf.float32, None, name='x')
+   y = tf.compat.v1.placeholder(tf.int64, [args.batch_size], name='y')
+   learning_rate = tf.compat.v1.placeholder(tf.float32, name='learning_rate')
+   train_phase = tf.compat.v1.placeholder(tf.bool, name='train_phase')
 
    # Construct model and optimizer
    pred = my_harmonic(args, x, train_phase)
@@ -194,7 +190,7 @@ def main(args):
    accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
 
    # Optimizer
-   optim = tf.train.AdamOptimizer(learning_rate=learning_rate)
+   optim = tf.compat.v1.train.AdamOptimizer(learning_rate=learning_rate)
    grads_and_vars = optim.compute_gradients(loss)
    modified_gvs = []
    # We precondition the phases, for faster descent, in the same way as biases
@@ -206,15 +202,15 @@ def main(args):
    
    ##### TRAIN ####
    # Configure tensorflow session
-   init_global = tf.global_variables_initializer()
-   init_local = tf.local_variables_initializer()
-   config = tf.ConfigProto()
+   init_global = tf.compat.v1.global_variables_initializer()
+   init_local = tf.compat.v1.local_variables_initializer()
+   config = tf.compat.v1.ConfigProto()
    config.gpu_options.allow_growth = True
    config.log_device_placement = False
    
    lr = args.learning_rate
-   saver = tf.train.Saver()
-   sess = tf.Session(config=config)
+   saver = tf.compat.v1.train.Saver()
+   sess = tf.compat.v1.Session(config=config)
    sess.run([init_global, init_local], feed_dict={train_phase : True})
    
    start = time.time()
@@ -253,8 +249,7 @@ def main(args):
       else:
          print('[{:04d} | {:0.1f}] Loss: {:04f}, Train Acc.: {:04f}, Learning rate: {:.2e}'.format(epoch,
             time.time()-start, train_loss, train_acc, lr))
-            
-      # Save model
+       # Save model     
       if epoch % 10 == 0:
          saver.save(sess, args.checkpoint_path)
          print('Model saved')
@@ -277,7 +272,6 @@ def main(args):
    
    print('Test Acc.: {:04f}'.format(test_acc))
    sess.close()
-      
 
 if __name__ == '__main__':
    parser = argparse.ArgumentParser()

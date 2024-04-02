@@ -29,11 +29,11 @@ def h_conv(X, W, strides=(1,1,1,1), padding='VALID', max_order=1, name='h_conv')
         # W_. For each output order, run through each input order and
         # copy-paste the filter for that convolution.
         W_ = []
-        for output_order in xrange(max_order+1):
+        for output_order in range(max_order+1):
             # For each output order build input
             Wr = []
             Wi = []
-            for input_order in xrange(Xsh[3]):
+            for input_order in range(Xsh[3]):
                 # Difference in orders is the convolution order
                 weight_order = output_order - input_order
                 weights = W[np.abs(weight_order)]
@@ -54,7 +54,7 @@ def h_conv(X, W, strides=(1,1,1,1), padding='VALID', max_order=1, name='h_conv')
         Y = tf.nn.conv2d(X_, W_, strides=strides, padding=padding, name=name)
         # Reshape result into appropriate format
         Ysh = Y.get_shape().as_list()
-        new_shape = tf.concat(axis=0, values=[Ysh[:3],[max_order+1,2],[Ysh[3]/(2*(max_order+1))]])
+        new_shape = tf.concat(axis=0, values=[Ysh[:3],[max_order+1,2],tf.cast([Ysh[3]/(2*(max_order+1))], dtype = "int32")])
         return tf.reshape(Y, new_shape)
 
 
@@ -83,11 +83,11 @@ def h_range_conv(X, W, strides=(1,1,1,1), padding='VALID', in_range=(0,1),
         # W_. For each output order, run through each input order and copy-paste
         # the filter for that convolution.
         W_ = []
-        for output_order in xrange(out_range[0], out_range[1]+1):
+        for output_order in range(out_range[0], out_range[1]+1):
             # For each output order build input
             Wr = []
             Wi = []
-            for input_order in xrange(in_range[0], in_range[1]+1):
+            for input_order in range(in_range[0], in_range[1]+1):
                 # Difference in orders is the convolution order
                 weight_order = output_order - input_order
                 weights = W[weight_order]
@@ -127,10 +127,10 @@ def h_nonlin(X, fnc, eps=1e-12, name='b'):
     """
     magnitude = stack_magnitudes(X, eps)
     msh = magnitude.get_shape()
-    b = tf.get_variable('b'+name, shape=[1,1,1,msh[3],1,msh[5]])
+    b = tf.compat.v1.get_variable('b'+name, shape=[1,1,1,msh[3],1,msh[5]])
 
     Rb = tf.add(magnitude, b)
-    c = tf.div(fnc(Rb), magnitude)
+    c = tf.compat.v1.div(fnc(Rb), magnitude)
     return c*X
 
 
@@ -147,7 +147,7 @@ def h_batch_norm(X, fnc, train_phase, decay=0.99, eps=1e-12, name='hbn'):
     with tf.name_scope(name) as scope:
         magnitude = stack_magnitudes(X, eps)
         Rb = bn(magnitude, train_phase, decay=decay, name=name)
-        c = tf.div(fnc(Rb), magnitude)
+        c = tf.compat.v1.div(fnc(Rb), magnitude)
         return c*X
 
 
@@ -165,21 +165,21 @@ def bn(X, train_phase, decay=0.99, name='batchNorm'):
     n_out = Xsh[-3:]
 
     with tf.name_scope(name) as scope:
-        beta = tf.get_variable(name+'_beta', dtype=tf.float32, shape=n_out,
+        beta = tf.compat.v1.get_variable(name+'_beta', dtype=tf.float32, shape=n_out,
                                       initializer=tf.constant_initializer(0.0))
-        gamma = tf.get_variable(name+'_gamma', dtype=tf.float32, shape=n_out,
+        gamma = tf.compat.v1.get_variable(name+'_gamma', dtype=tf.float32, shape=n_out,
                                         initializer=tf.constant_initializer(1.0))
-        pop_mean = tf.get_variable(name+'_pop_mean', dtype=tf.float32,
+        pop_mean = tf.compat.v1.get_variable(name+'_pop_mean', dtype=tf.float32,
                                             shape=n_out, trainable=False)
-        pop_var = tf.get_variable(name+'_pop_var', dtype=tf.float32,
+        pop_var = tf.compat.v1.get_variable(name+'_pop_var', dtype=tf.float32,
                                           shape=n_out, trainable=False)
-        batch_mean, batch_var = tf.nn.moments(X, np.arange(len(Xsh)-3), name=name+'moments')
+        batch_mean, batch_var = tf.nn.moments(X, np.arange(len(Xsh)-3).tolist(), name=name+'moments')
         ema = tf.train.ExponentialMovingAverage(decay=decay)
 
     def mean_var_with_update():
         ema_apply_op = ema.apply([batch_mean, batch_var])
-        pop_mean_op = tf.assign(pop_mean, ema.average(batch_mean))
-        pop_var_op = tf.assign(pop_var, ema.average(batch_var))
+        pop_mean_op = tf.compat.v1.assign(pop_mean, ema.average(batch_mean))
+        pop_var_op = tf.compat.v1.assign(pop_var, ema.average(batch_var))
 
         with tf.control_dependencies([ema_apply_op, pop_mean_op, pop_var_op]):
             return tf.identity(batch_mean), tf.identity(batch_var)
@@ -216,7 +216,7 @@ def stack_magnitudes(X, eps=1e-12, keep_dims=True):
     X: dict of channels {rotation order: (real, imaginary)}
     eps: regularization since grad |Z| is infinite at zero (default 1e-12)
     """
-    R = tf.reduce_sum(tf.square(X), axis=[4], keep_dims=keep_dims)
+    R = tf.compat.v1.reduce_sum(tf.square(X), axis=[4], keep_dims=keep_dims)
     return tf.sqrt(tf.maximum(R,eps))
 
 
@@ -242,7 +242,7 @@ def get_weights(filter_shape, W_init=None, std_mult=0.4, name='W'):
     if W_init == None:
         stddev = std_mult*np.sqrt(2.0 / np.prod(filter_shape[:3]))
         W_init = tf.random_normal_initializer(stddev=stddev)
-    return tf.get_variable(name, dtype=tf.float32, shape=filter_shape,
+    return tf.compat.v1.get_variable(name, dtype=tf.float32, shape=filter_shape,
             initializer=W_init)
 
 
@@ -279,7 +279,7 @@ def get_filters(R, filter_size, P=None, n_rings=None):
     filters = {}
     N = n_samples(k)
     from scipy.linalg import dft
-    for m, r in R.iteritems():
+    for m, r in R.items():
         rsh = r.get_shape().as_list()
         # Get the basis matrices
         weights = get_interpolation_weights(k, m, n_rings=n_rings)
@@ -328,10 +328,10 @@ def get_weights_dict(shape, max_order, std_mult=0.4, n_rings=None, name='W'):
     dev: (default /cpu:0)
     """
     if isinstance(max_order, int):
-        orders = xrange(-max_order, max_order+1)
+        orders = range(-max_order, max_order+1)
     else:
         diff = max_order[1]-max_order[0]
-        orders = xrange(-diff, diff+1)
+        orders = range(-diff, diff+1)
     weights_dict = {}
     for i in orders:
         if n_rings is None:
@@ -345,15 +345,15 @@ def get_weights_dict(shape, max_order, std_mult=0.4, n_rings=None, name='W'):
 def get_phase_dict(n_in, n_out, max_order, name='b'):
     """Return a dict of phase offsets"""
     if isinstance(max_order, int):
-        orders = xrange(-max_order, max_order+1)
+        orders = range(-max_order, max_order+1)
     else:
         diff = max_order[1]-max_order[0]
-        orders = xrange(-diff, diff+1)
+        orders = range(-diff, diff+1)
     phase_dict = {}
     for i in orders:
         init = np.random.rand(1,1,n_in,n_out) * 2. *np.pi
         init = np.float32(init)
-        phase = tf.get_variable(name+'_'+str(i), dtype=tf.float32,
+        phase = tf.compat.v1.get_variable(name+'_'+str(i), dtype=tf.float32,
                                 shape=[1,1,n_in,n_out],
             initializer=tf.constant_initializer(init))
         phase_dict[i] = phase
