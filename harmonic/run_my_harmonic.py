@@ -126,7 +126,7 @@ def settings(args):
       args.n_filters = 8
       args.display_step = len(data['train_x'])/46
       args.is_classification = True
-      args.dim = 28
+      args.dim = 256
       args.crop_shape = 0
       args.n_channels = 1
       args.n_classes = 10
@@ -176,7 +176,7 @@ def main(args):
    ##### BUILD MODEL #####
    ## Placeholders
    # [args.batch_size, 784]
-   x = tf.compat.v1.placeholder(tf.float32, None, name='x')
+   x = tf.compat.v1.placeholder(tf.float32, [args.batch_size,(args.dim)**2], name='x')
    y = tf.compat.v1.placeholder(tf.int64, [args.batch_size], name='y')
    learning_rate = tf.compat.v1.placeholder(tf.float32, name='learning_rate')
    train_phase = tf.compat.v1.placeholder(tf.bool, name='train_phase')
@@ -226,6 +226,7 @@ def main(args):
       train_acc = 0.
       for i, (X, Y) in enumerate(batcher):
          feed_dict = {x: X, y: Y, learning_rate: lr, train_phase: True}
+         print("my tensor shape = " + str(X.shape))
          __, loss_, accuracy_ = sess.run([train_op, loss, accuracy], feed_dict=feed_dict)
          train_loss += loss_
          train_acc += accuracy_
