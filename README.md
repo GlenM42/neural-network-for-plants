@@ -1,5 +1,20 @@
 ## neural-network-for-plants
 
+
+## This Branch
+This branch contains the harmonic folder with some new files. Some of these files use code from [https://github.com/ejhumphrey/harmonic-cnn](https://github.com/danielewworrall/harmonicConvolutions) with some modifications throughout to attempt to make it useable with the custom dataset.
+- **run_my_harmonic.py**
+   - the runner file that actually runs the whole program
+- **nn_testing.py**
+   - This was an empty test file I used with some test code that didn't get saved
+- **my_harmonic_model.py**
+   - This is where the code for the neural network model goes.
+- **harmonic_network_ops.py** and **harmonic_network_lite.py**
+   - Nearly unchanged from the original outside of attempted compatibility changes.
+   - This contains all the functions needed for the model to build and run after it is defined in the other file.
+
+
+
 ### Plan
 1. Some of the useless columns got deleted. That way the user_data.csv went from being 500 MB to <100MB.
 2. A whole folder of python parses has been created to analyze the dataset.
