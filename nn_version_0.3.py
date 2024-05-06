@@ -32,28 +32,26 @@ else:
 
 # Model builder function for Keras Tuner
 def model_builder(hp):
-    model = keras.Sequential()
-
-    # Hyperparameters for data augmentation
-    hp_rotation = hp.Float('rotation_factor', min_value=0.0, max_value=0.5, step=0.1)
-    data_augmentation = keras.Sequential([
-        layers.RandomRotation(hp_rotation),
+    model = keras.Sequential([
+        # Data augmentation layer
+        keras.Sequential([
+            layers.RandomRotation(hp.Float('rotation_factor', min_value=0.0, max_value=0.5, step=0.1)),
+        ], name="data_augmentation"),
+        # Convolutional and pooling layers
+        layers.Conv2D(32, (3, 3), activation='relu', input_shape=(img_w, img_h, 3)),
+        layers.MaxPooling2D((2, 2)),
+        # Flatten the output of the conv layers before passing to the Dense layer
+        layers.Flatten(),
+        # Dropout layer with hyperparameter tuning
+        layers.Dropout(hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1)),
+        # Dense layer with L2 regularization
+        layers.Dense(64, activation='relu', kernel_regularizer=keras.regularizers.l2(hp.Float('l2_regularization',
+                                                                                              min_value=1e-5,
+                                                                                              max_value=1e-2,
+                                                                                              sampling='LOG'))),
+        # Final Dense layer with units matching the number of classes, adjusted to 5 based on the dataset
+        layers.Dense(5, activation='softmax'),
     ])
-    model.add(data_augmentation)
-
-    # Convolutional and pooling layers
-    model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(img_w, img_h, 3)))
-    model.add(layers.MaxPooling2D((2, 2)))
-
-    # Hyperparameters for dropout rate
-    hp_dropout = hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.1)
-    model.add(layers.Dropout(hp_dropout))
-
-    # Final layers
-    model.add(layers.Flatten())
-    hp_l2 = hp.Float('l2_regularization', min_value=1e-5, max_value=1e-2, sampling='LOG')
-    model.add(layers.Dense(64, activation='relu', kernel_regularizer=keras.regularizers.l2(hp_l2)))
-    model.add(layers.Dense(4, activation='softmax'))
 
     model.compile(optimizer='rmsprop',
                   loss='categorical_crossentropy',
