@@ -70,3 +70,8 @@ How to create a dataset of images with Keras
 https://keras.io/api/data_loading/image/
 
 
+The second branch in this repository also contains some extra files. I made an attempt to use a custom type of network that uses harmonics to do a convolutional neural network. This was problematic when it came to our custom dataset that used code from different versions of tensorflow. I was not able to get these to work correctly. It could be an interesting project for the future!
+
+
+
+
